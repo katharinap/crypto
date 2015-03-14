@@ -14,15 +14,4 @@ module Vigenere
       end
     end
   end
-
-  ENCRYPTED_TEXT = File.read(File.expand_path('../../data/cyphertext.txt', __FILE__))
-  
-  describe KeyLengthAnalyzer do
-    describe '.find' do
-      it 'returns the most likely key length for the given encrypted message' do
-        expect(KeyLengthAnalyzer.find(13, ENCRYPTED_TEXT)).to eq(7)
-      end
-    end
-  end
 end
-
