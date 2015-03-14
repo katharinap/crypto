@@ -62,4 +62,56 @@ module Vigenere
       str.gsub(/(..)/,'\1 ').rstrip.split
     end
   end
+
+  class KeyLengthAnalyzer
+    class << self
+      def find(upper_limit, encrypted_message)
+        best_match = (1..upper_limit).map do |key_length|
+          new(key_length, encrypted_message)
+        end.sort_by(&:index_of_coincidence).last
+
+        best_match.key_length
+      end
+    end
+
+    attr_reader :key_length, :encrypted_message
+
+    def initialize(key_length, encrypted_message)
+      @key_length = key_length
+      @encrypted_message = encrypted_message
+    end
+
+    def index_of_coincidence
+      (0..key_length - 1).inject do |sum, key_position|
+        res = index_of_coincidence_for_position(key_position) / key_length
+        sum + res
+      end
+    end
+
+    private
+
+    def message
+      @message ||= encrypted_message.gsub(/(..)/,'\1 ').rstrip.split
+    end
+
+    def index_of_coincidence_for_position(key_position)
+      chars = chars_for_position(key_position)
+
+      (0..255).inject do |sum, n|
+        hex_val = n.to_s(16).upcase
+        ct = chars.count(hex_val)
+        sum + ct * (ct - 1) 
+      end / (chars.size * (chars.size - 1)).to_f
+    end
+
+    def chars_for_position(key_position)
+      chars = []
+      idx = key_position
+      while idx < message.size
+        chars << message[idx]
+        idx += key_length
+      end
+      chars
+    end
+  end
 end
