@@ -57,10 +57,12 @@ module Vigenere
     # determines the most likely encryption key of the given length
     # evaluating the frequency of lower case letters
     class Decoder
-      attr_reader :key_length, :encrypted_chars
+      attr_reader :encrypted_chars, :key_length
 
-      def initialize(key_length, encrypted_message)
-        @key_length = key_length
+      def initialize(encrypted_message)
+        @key_length = KeyLength.find(13, encrypted_message)
+        fail 'Failed to determine key length' if key_length.nil?
+        puts "Found most likely key length #{key_length}"
         @encrypted_chars = encrypted_message.gsub(/(..)/, '\1 ').rstrip.split
       end
 
